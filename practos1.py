@@ -2,24 +2,23 @@ import abc
 import os
 
 class Person(abc.ABC):
-    """Абстрактный человек."""
     def __init__(self, name):
         self._name = name
 
-    @property
-    def name(self):
+    def get_name(self):
         return self._name
+
+    def set_name(self, name):
+        self._name = name
 
     @abc.abstractmethod
     def show_menu(self, library):
-        """Полиморфный метод для меню."""
         pass
 
 class Librarian(Person):
-    """Библиотекарь."""
     def show_menu(self, library):
         while True:
-            print("--- Библиотекарь ---")
+            print("Библиотекарь")
             print("1 - добавить книгу")
             print("2 - удалить книгу")
             print("3 - регистрация пользователя")
@@ -51,13 +50,11 @@ class Librarian(Person):
                 break
 
 class User(Person):
-    """Обычный пользователь."""
     def __init__(self, name):
         super().__init__(name)
         self._borrowed = []
 
-    @property
-    def borrowed(self):
+    def get_borrowed(self):
         return self._borrowed
 
     def take_book(self, book):
@@ -69,7 +66,7 @@ class User(Person):
 
     def show_menu(self, library):
         while True:
-            print(f"--- Пользователь {self.name} ---")
+            print(f"Пользователь {self.get_name()}")
             print("1 - доступные книги")
             print("2 - взять книгу")
             print("3 - выйти")
@@ -86,30 +83,25 @@ class User(Person):
                 break
 
 class Book:
-    """Модель книги."""
     def __init__(self, title, author, status="available"):
         self._title = title
         self._author = author
         self._status = status
 
-    @property
-    def title(self):
+    def get_title(self):
         return self._title
 
-    @property
-    def author(self):
+    def get_author(self):
         return self._author
 
-    @property
-    def status(self):
+    def get_status(self):
         return self._status
 
-    @status.setter
-    def status(self, value):
+    def set_status(self, value):
         self._status = value
 
     def __str__(self):
-        return f"{self._title} — {self._author} ({self._status})"
+        return f"{self.get_title()} — {self.get_author()} ({self.get_status()})"
 
 class Library:
     def __init__(self):
@@ -118,7 +110,6 @@ class Library:
         self._librarians = []
 
     def load_data(self):
-        """Читаем данные из текстовых файлов."""
         if os.path.exists("books.txt"):
             with open("books.txt", "r", encoding="utf-8") as f:
                 for line in f:
@@ -137,7 +128,7 @@ class Library:
                         book = self._find_book(title)
                         if book:
                             user.take_book(book)
-                            book.status = "issued"
+                            book.set_status("issued")
                     self._users.append(user)
 
         if os.path.exists("librarians.txt"):
@@ -146,21 +137,21 @@ class Library:
                     name = line.strip()
                     if name:
                         self._librarians.append(Librarian(name))
-        else:
+
+        if not self._librarians:
             self._librarians.append(Librarian("Vlados"))
             self._save_librarians()
 
     def save_data(self):
-        """Записываем все данные в файлы."""
         with open("books.txt", "w", encoding="utf-8") as f:
             for b in self._books:
-                f.write(f"{b.title},{b.author},{b.status}\n")
+                f.write(f"{b.get_title()},{b.get_author()},{b.get_status()}\n")
 
         with open("users.txt", "w", encoding="utf-8") as f:
             for u in self._users:
-                line = u.name
-                for b in u.borrowed:
-                    line += f",{b.title}"
+                line = u.get_name()
+                for b in u.get_borrowed():
+                    line += f",{b.get_title()}"
                 f.write(line + "\n")
 
         self._save_librarians()
@@ -168,24 +159,23 @@ class Library:
     def _save_librarians(self):
         with open("librarians.txt", "w", encoding="utf-8") as f:
             for lib in self._librarians:
-                f.write(lib.name + "\n")
+                f.write(lib.get_name() + "\n")
 
     def _find_book(self, title):
-        """Ищет книгу по точному названию (без учёта регистра)."""
         for book in self._books:
-            if book.title.lower() == title.lower():
+            if book.get_title().lower() == title.lower():
                 return book
         return None
 
     def find_user(self, name):
         for user in self._users:
-            if user.name.lower() == name.lower():
+            if user.get_name().lower() == name.lower():
                 return user
         return None
 
     def find_librarian(self, name):
         for lib in self._librarians:
-            if lib.name.lower() == name.lower():
+            if lib.get_name().lower() == name.lower():
                 return lib
         return None
 
@@ -218,27 +208,27 @@ class Library:
         if not self._users:
             print("Нет зарегистрированных пользователей.")
         else:
-            print("\n--- Пользователи ---")
+            print("Пользователи")
             for u in self._users:
-                taken = ", ".join(b.title for b in u.borrowed)
+                taken = ", ".join(b.get_title() for b in u.get_borrowed())
                 if not taken:
                     taken = "нет"
-                print(f"{u.name} : {taken}")
+                print(f"{u.get_name()} : {taken}")
 
     def show_all_books(self):
         if not self._books:
             print("В библиотеке нет книг.")
         else:
-            print("\n--- Все книги ---")
+            print("Все книги")
             for b in self._books:
                 print(b)
 
     def show_available_books(self):
-        available = [b for b in self._books if b.status == "available"]
+        available = [b for b in self._books if b.get_status() == "available"]
         if not available:
             print("Сейчас нет доступных книг.")
         else:
-            print("--- Доступные книги ---")
+            print("Доступные книги")
             for b in available:
                 print(b)
 
@@ -246,12 +236,12 @@ class Library:
         book = self._find_book(title)
         if not book:
             print("Книга не найдена.")
-        elif book.status == "issued":
+        elif book.get_status() == "issued":
             print("Эта книга уже выдана.")
         else:
-            book.status = "issued"
+            book.set_status("issued")
             user.take_book(book)
-            print(f"Книга '{title}' выдана пользователю {user.name}.")
+            print(f"Книга '{title}' выдана пользователю {user.get_name()}.")
             self.save_data()
 
 def main():
@@ -259,7 +249,7 @@ def main():
     lib.load_data()
 
     while True:
-        print("=== Система управления библиотекой ===")
+        print("Система управления библиотекой")
         print("1 - войти как библиотекарь")
         print("2 - войти как пользователь")
         print("3 - выход")
