@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // Исходные данные
+const users = [
+  { id: 1, name: "Anna", age: 22, city: "Moscow", isActive: true },
+  { id: 2, name: "Oleg", age: 17, city: "Kazan", isActive: false },
+  { id: 3, name: "Ivan", age: 30, city: "Moscow", isActive: true },
+  { id: 4, name: "Maria", age: 25, city: "Sochi", isActive: false }
+];
+
+function getActiveUsers(users) {
+  return users.filter(user => user.isActive);
+}
+
+const getUserNames = (users) => users.map(user => user.name);
+
+function findUserById(users, id) {
+  return users.find(user => user.id === id) || null;
+}
+
+function getUsersStatistics(users) {
+  const total = users.length;
+  const active = users.filter(user => user.isActive).length;
+  const inactive = total - active;
+  return { total, active, inactive };
+}
+
+function getAverageAge(users) {
+  if (users.length === 0) return 0;
+  const sum = users.reduce((acc, user) => acc + user.age, 0);
+  return sum / users.length;
+}
+
+function groupUsersByCity(users) {
+  return users.reduce((acc, user) => {
+    const city = user.city;
+    if (!acc[city]) {
+      acc[city] = [];
+    }
+    acc[city].push(user);
+    return acc;
+  }, {});
+}
+
+console.log('getActiveUsers:', getActiveUsers(users));
+console.log('getUserNames:', getUserNames(users));
+console.log('findUserById (id=3):', findUserById(users, 3));
+console.log('findUserById (id=99):', findUserById(users, 99));
+console.log('getUsersStatistics:', getUsersStatistics(users));
+console.log('getAverageAge:', getAverageAge(users));
+console.log('groupUsersByCity:', groupUsersByCity(users));
+    </script>
+</body>
+</html>
