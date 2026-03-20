@@ -1,7 +1,6 @@
 import abc
 import os
-import pickle  # добавлен импорт модуля pickle
-
+import pickle
 class Person(abc.ABC):
     def __init__(self, name):
         self._name = name
